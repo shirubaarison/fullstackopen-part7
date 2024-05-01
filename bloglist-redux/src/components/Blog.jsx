@@ -1,17 +1,34 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { getBlogs, removeBlog, addLike } from '../reducers/blogReducer'
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog }) => {
+    const dispatch = useDispatch()
     const [showDetails, setShowDetails] = useState(false)
 
     const storedUser = JSON.parse(
         window.localStorage.getItem('loggedBloglistUser')
     )
-    const username = storedUser ? storedUser.username : ''
 
+    const username = storedUser ? storedUser.username : ''
     const showDeleteButton = blog.user.username === username ? true : false
 
     const hideWhenVisible = { display: showDetails ? 'none' : '' }
     const shownWhenVisible = { display: showDetails ? '' : 'none' }
+
+    const like = () => {
+        const changedObj = {
+            ...blog,
+            likes: (blog.likes || 0) + 1,
+        }
+        dispatch(addLike(changedObj, blog.id))
+    }
+
+    const remove = () => {
+        if (window.confirm(`remove blog ${blog.title} by ${blog.author}`)) {
+            dispatch(removeBlog(blog.title, blog.id))
+        }
+    }
 
     return (
         <tr>
@@ -50,7 +67,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
                             <button
                                 className="btn btn-outline-secondary"
                                 id="like-button"
-                                onClick={addLike}
+                                onClick={like}
                             >
                                 like
                             </button>
@@ -58,7 +75,7 @@ const Blog = ({ blog, addLike, removeBlog }) => {
                                 <button
                                     className="btn btn-outline-secondary"
                                     id="delete-button"
-                                    onClick={removeBlog}
+                                    onClick={remove}
                                 >
                                     remove
                                 </button>
@@ -71,4 +88,25 @@ const Blog = ({ blog, addLike, removeBlog }) => {
     )
 }
 
-export default Blog
+const Blogs = () => {
+    const blogs = useSelector(getBlogs)
+
+    return (
+        <table className="table" id="blog-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {blogs.map((blog) => (
+                    <Blog key={blog.id} blog={blog} />
+                ))}
+            </tbody>
+        </table>
+    )
+}
+
+export default Blogs

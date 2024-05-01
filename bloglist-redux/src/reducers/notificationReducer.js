@@ -38,8 +38,9 @@ export const setError = (text, time) => {
     }
 }
 
-export const getNotification = state => state.notification ? state.notification.notification : null
-export const getError = state => state.notification ? state.notification.error : null
-
+export const getNotification = (state) =>
+    state.notification ? state.notification.notification : null
+export const getError = (state) =>
+    state.notification ? state.notification.error : null
 
 export default notificationSlice.reducer
