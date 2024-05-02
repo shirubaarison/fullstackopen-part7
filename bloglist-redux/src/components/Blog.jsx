@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getBlogs, removeBlog, addLike } from '../reducers/blogReducer'
+import { getUser } from '../reducers/userReducer'
 
 const Blog = ({ blog }) => {
     const dispatch = useDispatch()
     const [showDetails, setShowDetails] = useState(false)
 
-    const storedUser = JSON.parse(
-        window.localStorage.getItem('loggedBloglistUser')
-    )
+    const storedUser = useSelector(getUser)
 
     const username = storedUser ? storedUser.username : ''
     const showDeleteButton = blog.user.username === username ? true : false
