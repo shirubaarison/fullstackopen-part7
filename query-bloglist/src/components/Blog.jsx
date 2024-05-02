@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useError, useNotificate } from '../NotificationContext'
+import { useQuery } from '@tanstack/react-query'
+import blogService from '../services/blogs'
 
-const Blog = ({ blog, addLike, removeBlog }) => {
+const Blog = ({ blog }) => {
+    const queryClient =  useQueryClient()
+    const notificationDispatch = useNotificate()
+    const errorDispatch = useError()
+
     const [showDetails, setShowDetails] = useState(false)
 
     const storedUser = JSON.parse(window.localStorage.getItem('loggedBloglistUser'))
@@ -10,6 +18,43 @@ const Blog = ({ blog, addLike, removeBlog }) => {
 
     const hideWhenVisible = { display: showDetails ? 'none' : '' }
     const shownWhenVisible = { display: showDetails ? '' : 'none' }
+
+    const addLikeMutation = useMutation({
+        mutationFn: ({ id, likedBlog }) => blogService.addLike(id, likedBlog),
+        onSuccess: (updatedBlog) => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(['blogs'], blogs.map(b => b.id === updatedBlog.id ? updatedBlog : b))
+            notificationDispatch(`you liked ${updatedBlog.title}`, 5)
+        },
+        onError: (err) => {
+            errorDispatch(err.message, 5)
+        }
+    })
+
+    const removeMutation = useMutation({
+        mutationFn: blogService.removeBlog,
+        onSuccess: () => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(['blogs'], blogs.filter(b => b.id !== blog.id))
+            notificationDispatch(`you removed ${blog.title}`, 5)
+        },
+        onError: (err) => {
+            errorDispatch(err.message, 5)
+        }
+    })
+
+    const addLike = () => {
+        const likedBlog = {
+            ...blog,
+            likes: (blog.likes || 0) + 1,
+        }
+
+        addLikeMutation.mutate({ id: blog.id, likedBlog })
+    }
+
+    const removeBlog = () => {
+        removeMutation.mutate(blog.id)
+    }
 
     return (
         <tr>
@@ -38,6 +83,37 @@ const Blog = ({ blog, addLike, removeBlog }) => {
     )
 }
 
+const Blogs = () => {
+    const blogsQuery = useQuery({
+        queryKey: ['blogs'],
+        queryFn: blogService.getAll,
+        retry: false
+    })
+
+    const blogs = blogsQuery.data
+
+    if (blogsQuery.isLoading || blogsQuery.isError) {
+        return <div>blogs are not available due to problems in server</div>
+    }
+
+    return (
+        <table className="table" id="blog-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {blogs.map((blog) => (
+                    <Blog key={blog.id} blog={blog} />
+                ))}
+            </tbody>
+        </table>
+    )
+}
 
 
-export default Blog
+
+export default Blogs
