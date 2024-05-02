@@ -25,11 +25,15 @@ const blogsReducer = createSlice({
         sortByLikes(state, action) {
             return state.sort((a, b) => b.likes - a.likes)
         },
+        commentBlog(state, action) {
+            return state.map(blog =>
+                blog.id === action.payload.id ? action.payload : blog
+            )
+        }
     },
 })
 
-export const { setBlogs, appendBlog, deleteBlog, increaseLike, sortByLikes } =
-    blogsReducer.actions
+export const { setBlogs, appendBlog, deleteBlog, increaseLike, sortByLikes, commentBlog } = blogsReducer.actions
 
 export const initializeBlogs = () => {
     return async (dispatch) => {
@@ -76,6 +80,18 @@ export const addLike = (obj, id) => {
             dispatch(increaseLike(id))
             dispatch(setNotification(`you liked ${response.title}`, 5))
             dispatch(sortByLikes())
+        } catch (err) {
+            dispatch(setError(err.response.data.error, 5))
+        }
+    }
+}
+
+export const addComment = (id, comment) => {
+    return async dispatch => {
+        try {
+            const response = await blogService.addComment(id, comment)
+            dispatch(setNotification(`you commented on ${response.title}`, 5))
+            dispatch(commentBlog(response))
         } catch (err) {
             dispatch(setError(err.response.data.error, 5))
         }

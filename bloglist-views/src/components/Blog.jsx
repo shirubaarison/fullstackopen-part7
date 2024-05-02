@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBlogs, removeBlog, addLike } from '../reducers/blogReducer'
+import { getBlogs, removeBlog, addLike, addComment } from '../reducers/blogReducer'
 import { getUser } from '../reducers/userReducer'
 import { Link, Route, Routes, redirect, useMatch } from 'react-router-dom'
 
@@ -90,13 +90,20 @@ const Blog = ({ blog }) => {
 
 const BlogView = ({ blog }) => {
     const dispatch = useDispatch()
-
     const like = () => {
         const changedObj = {
             ...blog,
             likes: (blog.likes || 0) + 1,
         }
         dispatch(addLike(changedObj, blog.id))
+    }
+
+    const comment = (event) => {
+        event.preventDefault()
+        const comment = event.target.comment.value
+        event.target.comment.value = ''
+
+        dispatch(addComment(blog.id, comment))
     }
 
     if (!blog) return null
@@ -107,7 +114,7 @@ const BlogView = ({ blog }) => {
             <br></br>
             <h4>author: {blog.author}</h4>
             <h4>likes: {blog.likes}</h4>
-            <h4><a href={blog.url}>{blog.url}</a></h4>
+            <h4>URL: <a href={blog.url}>{blog.url}</a></h4>
             <h5>added by {blog.user.username}</h5>
             <button
                 className="btn btn-outline-secondary"
@@ -117,6 +124,14 @@ const BlogView = ({ blog }) => {
                 like
             </button>
             <br></br>
+            <h3>comments</h3>
+            <form onSubmit={comment}>
+                <input type='text' name='comment' />
+                <button className="btn btn-outline-secondary">comment</button>
+            </form>
+            <ul>
+                {blog.comments.map(comment => <li key={comment}>{comment}</li>)}
+            </ul>
         </div>
     )
 }
