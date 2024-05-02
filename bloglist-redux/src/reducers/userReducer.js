@@ -21,7 +21,6 @@ export const { setUser, reset } = userSlice.actions
 export const initializeUser = () => {
     return async (dispatch) => {
         const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
-        console.log(loggedUserJSON)
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
             await blogService.setToken(user.token)
