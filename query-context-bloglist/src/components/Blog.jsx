@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useError, useNotificate } from '../NotificationContext'
 import { useQuery } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import { useUserValue } from '../UserContext'
 
 const Blog = ({ blog }) => {
     const queryClient =  useQueryClient()
@@ -11,7 +12,7 @@ const Blog = ({ blog }) => {
 
     const [showDetails, setShowDetails] = useState(false)
 
-    const storedUser = JSON.parse(window.localStorage.getItem('loggedBloglistUser'))
+    const storedUser = useUserValue()
     const username = storedUser ? storedUser.username : ''
 
     const showDeleteButton = blog.user.username === username ? true : false
@@ -53,7 +54,9 @@ const Blog = ({ blog }) => {
     }
 
     const removeBlog = () => {
-        removeMutation.mutate(blog.id)
+        if (window.confirm(`remove blog ${blog.title} by ${blog.author}`)) {
+            removeMutation.mutate(blog.id)
+        }
     }
 
     return (

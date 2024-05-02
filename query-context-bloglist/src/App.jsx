@@ -5,8 +5,7 @@ import LoginForm from './components/LoginForm'
 
 import './index.css'
 
-import { useCheckLoggedUser, useLogout, useUserValue } from './UserContext'
-import { useEffect } from 'react'
+import { useLogout, useUserValue } from './UserContext'
 
 const App = () => {
     const logout = useLogout()
