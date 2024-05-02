@@ -12,6 +12,7 @@ import { getUser, initializeUser, logout } from './reducers/userReducer'
 import { Route, Routes } from 'react-router-dom'
 import Menu from './components/Menu'
 import Users from './components/Users'
+import { Container } from 'react-bootstrap'
 
 const App = () => {
     const dispatch = useDispatch()
@@ -29,10 +30,12 @@ const App = () => {
     if (user) {
         return (
             <div>
-                <div className="p-5 mb-3 bg-primary text-white">
-                    <h2>Blogs</h2>
-                </div>
                 <Menu />
+                <div className="p-5 mb-3 bg-primary text-white">
+                    <Container>
+                        <h2>Blogs</h2>
+                    </Container>
+                </div>
                 <div className="p-5">
                     <Notification />
                     <div className="container">

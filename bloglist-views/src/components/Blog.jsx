@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getBlogs, removeBlog, addLike, addComment } from '../reducers/blogReducer'
 import { getUser } from '../reducers/userReducer'
 import { Link, Route, Routes, redirect, useMatch } from 'react-router-dom'
+import { Button, Card, Container, ListGroup } from 'react-bootstrap'
 
 const Blog = ({ blog }) => {
     const dispatch = useDispatch()
@@ -109,30 +110,42 @@ const BlogView = ({ blog }) => {
     if (!blog) return null
 
     return (
-        <div className='container'>
-            <h1>{blog.title}</h1>
-            <br></br>
-            <h4>author: {blog.author}</h4>
-            <h4>likes: {blog.likes}</h4>
-            <h4>URL: <a href={blog.url}>{blog.url}</a></h4>
-            <h5>added by {blog.user.username}</h5>
-            <button
-                className="btn btn-outline-secondary"
-                id="like-button"
-                onClick={like}
-            >
-                like
-            </button>
-            <br></br>
-            <h3>comments</h3>
-            <form onSubmit={comment}>
-                <input type='text' name='comment' />
-                <button className="btn btn-outline-secondary">comment</button>
-            </form>
-            <ul>
-                {blog.comments.map(comment => <li key={comment}>{comment}</li>)}
-            </ul>
-        </div>
+        <Container>
+            <Card style={{ width: '28rem' }}>
+                <Card.Body>
+                    <Card.Title>{blog.title}</Card.Title>
+                    <ListGroup className="list-group-flush">
+                        <ListGroup.Item>
+                            author: {blog.author}
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                            likes: {blog.likes}
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                        URL: <a href={blog.url}>{blog.url}</a>
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                            added by {blog.user.username}
+                            <Button variant='primary' id="like-button" onClick={like}>
+                                like
+                            </Button>
+                        </ListGroup.Item>
+                    </ListGroup>
+                    <Card.Text>comments</Card.Text>
+                    <Card.Body>
+                        <form onSubmit={comment}>
+                            <input type='text' name='comment' />
+                            <Button variant='secondary '>comment</Button>
+                        </form>
+                    </Card.Body>
+                    <ListGroup className="list-group-flush">
+                        <ul>
+                            {blog.comments.map(comment => <li key={comment}>{comment}</li>)}
+                        </ul>
+                    </ListGroup>
+                </Card.Body>
+            </Card>
+        </Container>
     )
 }
 
